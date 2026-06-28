@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Navbar() {
+function Sidebar() {
   return (
     <div class="h-screen overflow-y-auto bg-[#121212] text-white">
       <div class="flex min-h-[calc(100vh-66px)] sm:min-h-[calc(100vh-82px)]">
@@ -95,4 +95,4 @@ function Navbar() {
   )
 }
 
-export default Navbar
+export default Sidebar
