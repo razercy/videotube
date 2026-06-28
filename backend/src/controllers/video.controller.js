@@ -9,14 +9,35 @@ import {uploadOnCloudinary} from "../utils/cloudinary.js"
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query
+
+    query = query.trim()
+
+    let trimmedQuery;
+
+    if (query === "") {
+        trimmedQuery = ""
+    } else {
+        trimmedQuery = query[0];
+
+        for (let index = 1; index < query.length; index++) {
+            if (query[index] !== " " || query[index-1] !== " ") {
+                trimmedQuery += query[index];
+            }
+            
+        }
+    }
     
-    const videos = await Video.aggregate([
+    const videos = trimmedQuery === "" ? [] : await Video.aggregate([
         {
             $match: {
                 owner: userId,
                 $or: [
-                    { title: { $regex: query, $options: "i" } },
-                    { description: { $regex: query, $options: "i" } }
+                    { title: { trimmedQuery, $options: "i" } },
+                    { title: { $regex: " " + trimmedQuery, $options: "i" } },
+                    { title: { $regex: trimmedQuery + " ", $options: "i" } },
+                    { description: { trimmedQuery, $options: "i" } },
+                    { description: { $regex: " " + trimmedQuery, $options: "i" } },
+                    { description: { $regex: trimmedQuery + " ", $options: "i" } }
                 ]
             }
         },
