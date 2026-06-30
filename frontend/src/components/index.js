@@ -12,6 +12,7 @@ import PersonalInfo from "./EditInfo/PersonalInfo";
 import ChannelInfo from "./EditInfo/ChannelInfo";
 import ChgPassword from "./EditInfo/ChgPassword";
 import AuthLayout from "./AuthLayout";
+import Playlist from "./Playlist";
 export {
     Header,
     Sidebar,
@@ -26,5 +27,6 @@ export {
     PersonalInfo,
     ChannelInfo,
     ChgPassword,
-    AuthLayout
+    AuthLayout,
+    Playlist
 }

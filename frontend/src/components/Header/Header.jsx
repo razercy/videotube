@@ -1,16 +1,20 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import axios from 'axios'
 
 function Header() {
     const authStatus = useSelector((state) => state.auth.status)
+    const authUserData = useSelector((state) => state.auth.userData)
+    const navigate = useNavigate()
+    const {register, handleSubmit} = useForm()
 
   return (
-    <div class="h-screen overflow-y-auto bg-[#121212] text-white">
-        <header class="sticky inset-x-0 top-0 z-50 w-full border-b border-white bg-[#121212] px-4">
-            <nav class="mx-auto flex max-w-7xl items-center py-2">
-                <div class="mr-4 w-12 shrink-0 sm:w-16">
+    <div className="h-screen overflow-y-auto bg-[#121212] text-white">
+        <header className="sticky inset-x-0 top-0 z-50 w-full border-b border-white bg-[#121212] px-4">
+            <nav className="mx-auto flex max-w-7xl items-center py-2">
+                <div className="mr-4 w-12 shrink-0 sm:w-16">
                     <svg
                     style="width:100%"
                     viewBox="0 0 63 64"
@@ -58,11 +62,15 @@ function Header() {
                     </defs>
                     </svg>
                 </div>
-                <div class="relative mx-auto hidden w-full max-w-md overflow-hidden sm:block">
-                    <input
-                    class="w-full border bg-transparent py-1 pl-8 pr-3 placeholder-white outline-none sm:py-2"
-                    placeholder="Search" />
-                    <span class="absolute left-2.5 top-1/2 inline-block -translate-y-1/2">
+                <div className="relative mx-auto hidden w-full max-w-md overflow-hidden sm:block">
+                    <form onSubmit={handleSubmit((data) => navigate(`/results/${encodeURIComponent(data.search_query)}`))}>
+                        <input
+                        className="w-full border bg-transparent py-1 pl-8 pr-3 placeholder-white outline-none sm:py-2"
+                        placeholder="Search"
+                        {...register("search_query")}
+                        />
+                    </form>
+                    <span className="absolute left-2.5 top-1/2 inline-block -translate-y-1/2">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -70,7 +78,7 @@ function Header() {
                         stroke-width="1.5"
                         stroke="currentColor"
                         aria-hidden="true"
-                        class="h-4 w-4">
+                        className="h-4 w-4">
                         <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
@@ -78,7 +86,7 @@ function Header() {
                     </svg>
                     </span>
                 </div>
-                <button class="ml-auto sm:hidden">
+                <button className="ml-auto sm:hidden">
                     <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -86,22 +94,22 @@ function Header() {
                     stroke-width="1.5"
                     stroke="currentColor"
                     aria-hidden="true"
-                    class="h-6 w-6">
+                    className="h-6 w-6">
                     <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
                         d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
                     </svg>
                 </button>
-                <button class="group peer ml-4 flex w-6 shrink-0 flex-wrap gap-y-1.5 sm:hidden">
-                    <span class="block h-0.5 w-full bg-white group-hover:bg-[#ae7aff]"></span>
-                    <span class="block h-0.5 w-2/3 bg-white group-hover:bg-[#ae7aff]"></span>
-                    <span class="block h-0.5 w-full bg-white group-hover:bg-[#ae7aff]"></span>
+                <button className="group peer ml-4 flex w-6 shrink-0 flex-wrap gap-y-1.5 sm:hidden">
+                    <span className="block h-0.5 w-full bg-white group-hover:bg-[#ae7aff]"></span>
+                    <span className="block h-0.5 w-2/3 bg-white group-hover:bg-[#ae7aff]"></span>
+                    <span className="block h-0.5 w-full bg-white group-hover:bg-[#ae7aff]"></span>
                 </button>
                 <div
-                    class="fixed inset-y-0 right-0 flex w-full max-w-xs shrink-0 translate-x-full flex-col border-l border-white bg-[#121212] duration-200 hover:translate-x-0 peer-focus:translate-x-0 sm:static sm:ml-4 sm:w-auto sm:translate-x-0 sm:border-none">
-                    <div class="relative flex w-full items-center justify-between border-b border-white px-4 py-2 sm:hidden">
-                    <span class="inline-block w-12">
+                    className="fixed inset-y-0 right-0 flex w-full max-w-xs shrink-0 translate-x-full flex-col border-l border-white bg-[#121212] duration-200 hover:translate-x-0 peer-focus:translate-x-0 sm:static sm:ml-4 sm:w-auto sm:translate-x-0 sm:border-none">
+                    <div className="relative flex w-full items-center justify-between border-b border-white px-4 py-2 sm:hidden">
+                    <span className="inline-block w-12">
                         <svg
                         style="width:100%"
                         viewBox="0 0 63 64"
@@ -149,7 +157,7 @@ function Header() {
                         </defs>
                         </svg>
                     </span>
-                    <button class="inline-block w-8">
+                    <button className="inline-block w-8">
                         <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -164,11 +172,11 @@ function Header() {
                         </svg>
                     </button>
                     </div>
-                    <ul class="my-4 flex w-full flex-wrap gap-2 px-4 sm:hidden">
-                    <li class="w-full">
+                    <ul className="my-4 flex w-full flex-wrap gap-2 px-4 sm:hidden">
+                    <li className="w-full">
                         <button
-                        class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
-                        <span class="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
+                        className="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
+                        <span className="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
                             <svg
                             style="width:100%"
                             viewBox="0 0 22 22"
@@ -185,10 +193,10 @@ function Header() {
                         <span>Liked Videos</span>
                         </button>
                     </li>
-                    <li class="w-full">
+                    <li className="w-full">
                         <button
-                        class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
-                        <span class="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
+                        className="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
+                        <span className="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
                             <svg
                             style="width:100%"
                             viewBox="0 0 22 16"
@@ -211,10 +219,10 @@ function Header() {
                         <span>My Content</span>
                         </button>
                     </li>
-                    <li class="w-full">
+                    <li className="w-full">
                         <button
-                        class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
-                        <span class="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
+                        className="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
+                        <span className="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
                             <svg
                             style="width:100%"
                             viewBox="0 0 22 22"
@@ -231,10 +239,10 @@ function Header() {
                         <span>Support</span>
                         </button>
                     </li>
-                    <li class="w-full">
+                    <li className="w-full">
                         <button
-                        class="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
-                        <span class="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
+                        className="flex w-full items-center justify-start gap-x-4 border border-white px-4 py-1.5 text-left hover:bg-[#ae7aff] hover:text-black focus:border-[#ae7aff] focus:bg-[#ae7aff] focus:text-black">
+                        <span className="inline-block w-full max-w-5 group-hover:mr-4 lg:mr-4">
                             <svg
                             style="width:100%"
                             viewBox="0 0 22 22"
@@ -261,24 +269,109 @@ function Header() {
                     {
                         authStatus
                         ? (
-                            <div class="mb-8 mt-auto px-4 sm:mb-0 sm:mt-0 sm:px-0">
-                            <button class="flex w-full gap-4 text-left sm:items-center">
+                            <div className="mb-8 mt-auto px-4 sm:mb-0 sm:mt-0 sm:px-0">
+                            <button
+                            onClick={async() => {
+                                try {
+                                    const user = await axios.get(
+                                        "/api/v1/users/current-user",
+                                        {
+                                            user: authUserData
+                                        }
+                                    );
+                                    const userChannelProfile = await axios.get(
+                                        `/api/v1/users/c/${encodeURIComponent(user._id)}`,
+                                        {
+                                            params: {
+                                                username: user.username
+                                            }
+                                        }
+                                    );
+                                    navigate(`/channel/${encodeURIComponent(userChannelProfile._id)}/editing/contact-info`);
+                                } catch (error) {
+                                    navigate(0);
+                                }
+                            }}
+                            className="flex w-full gap-4 text-left sm:items-center">
                                 <img
-                                src="https://images.pexels.com/photos/1115816/pexels-photo-1115816.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                src={(async() => {
+                                    try {
+                                        const user = await axios.get(
+                                            "/api/v1/users/current-user",
+                                            {
+                                                user: authUserData
+                                            }
+                                        );
+                                        const userChannelProfile = await axios.get(
+                                            `/api/v1/users/c/${encodeURIComponent(user._id)}`,
+                                            {
+                                                params: {
+                                                    username: user.username
+                                                }
+                                            }
+                                        );
+                                        return userChannelProfile.avatar;
+                                    } catch (error) {
+                                        return "https://images.pexels.com/photos/1115816/pexels-photo-1115816.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1";
+                                    }
+                                })()}
                                 alt="React-Patterns"
-                                class="h-16 w-16 shrink-0 rounded-full sm:h-12 sm:w-12" />
-                                <div class="w-full pt-2 sm:hidden">
-                                <h6 class="font-semibold">React Patterns</h6>
-                                <p class="text-sm text-gray-300">@reactpatterns</p>
+                                className="h-16 w-16 shrink-0 rounded-full sm:h-12 sm:w-12" />
+                                <div className="w-full pt-2 sm:hidden">
+                                <h6 className="font-semibold">{(async() => {
+                                    try {
+                                        const user = await axios.get(
+                                            "/api/v1/users/current-user",
+                                            {
+                                                user: authUserData
+                                            }
+                                        );
+                                        const userChannelProfile = await axios.get(
+                                            `/api/v1/users/c/${encodeURIComponent(user._id)}`,
+                                            {
+                                                params: {
+                                                    username: user.username
+                                                }
+                                            }
+                                        );
+                                        return userChannelProfile.fullName;
+                                    } catch (error) {
+                                        return "React Patterns";
+                                    }
+                                })()}</h6>
+                                <p className="text-sm text-gray-300">@{(async() => {
+                                    try {
+                                        const user = await axios.get(
+                                            "/api/v1/users/current-user",
+                                            {
+                                                user: authUserData
+                                            }
+                                        );
+                                        const userChannelProfile = await axios.get(
+                                            `/api/v1/users/c/${encodeURIComponent(user._id)}`,
+                                            {
+                                                params: {
+                                                    username: user.username
+                                                }
+                                            }
+                                        );
+                                        return userChannelProfile.username;
+                                    } catch (error) {
+                                        return "reactpatterns";
+                                    }
+                                })()}</p>
                                 </div>
                             </button>
                             </div>
                         )
                         : (
-                            <div class="mb-8 mt-auto flex w-full flex-wrap gap-4 px-4 sm:mb-0 sm:mt-0 sm:items-center sm:px-0">
-                            <button class="w-full bg-[#383737] px-3 py-2 hover:bg-[#4f4e4e] sm:w-auto sm:bg-transparent">Log in</button>
+                            <div className="mb-8 mt-auto flex w-full flex-wrap gap-4 px-4 sm:mb-0 sm:mt-0 sm:items-center sm:px-0">
                             <button
-                                class="mr-1 w-full bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-1.25 active:translate-y-1.25 active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto">
+                            onClick={() => navigate("/login")}
+                            className="w-full bg-[#383737] px-3 py-2 hover:bg-[#4f4e4e] sm:w-auto sm:bg-transparent">Log in</button>
+                            <button
+                            onClick={() => navigate("/signup")}
+                            className="mr-1 w-full bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-1.25 active:translate-y-1.25 active:shadow-[0px_0px_0px_0px_#4f4e4e] sm:w-auto">
                                 Sign up
                             </button>
                             </div>

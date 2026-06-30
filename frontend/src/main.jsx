@@ -28,6 +28,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy.jsx'
 import TnC from './pages/TnC.jsx'
 import { Provider } from 'react-redux'
 import store from './store/store.js'
+import Playlist from './pages/Playlist.jsx'
 
 const router = createBrowserRouter([
   {
@@ -51,28 +52,28 @@ const router = createBrowserRouter([
           </AuthLayout>
         )
       },
-      {
-        path: "/:channel",
-        element: <Channel />,
-        children: [
-          {
-            path: "/videos",
-            element: <ChannelVideos />
-          },
-          {
-            path: "/playlist",
-            element: <ChannelPlaylist />
-          },
-          {
-            path: "/tweets",
-            element: <ChannelTweets />
-          },
-          {
-            path: "/subscribed",
-            element: <ChannelSubscribed />
-          }
-        ]
-      },
+      // {
+      //   path: "/:channel",
+      //   element: <Channel />,
+      //   children: [
+      //     // {
+      //     //   path: "/videos",
+      //     //   element: <ChannelVideos />
+      //     // },
+      //     // {
+      //     //   path: "/playlist",
+      //     //   element: <ChannelPlaylist />
+      //     // },
+      //     // {
+      //     //   path: "/tweets",
+      //     //   element: <ChannelTweets />
+      //     // },
+      //     {
+      //       path: "/subscribed",
+      //       element: <ChannelSubscribed />
+      //     }
+      //   ]
+      // },
       {
         path: "/login",
         element: (
@@ -190,6 +191,10 @@ const router = createBrowserRouter([
       {
         path: "/t/terms",
         element: <TnC />
+      },
+      {
+        path: "/playlist/:list",
+        element: <Playlist />
       }
     ]
   }
