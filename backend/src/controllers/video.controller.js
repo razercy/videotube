@@ -27,10 +27,12 @@ const getAllVideos = asyncHandler(async (req, res) => {
         }
     }
     
+    const user = await User.findById(userId)
+
     const videos = trimmedQuery === "" ? [] : await Video.aggregate([
         {
             $match: {
-                owner: userId,
+                owner: user,
                 $or: [
                     { title: { trimmedQuery, $options: "i" } },
                     { title: { $regex: " " + trimmedQuery, $options: "i" } },
@@ -96,13 +98,15 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Error while uploading on thumbnail")
     }
 
+    const user = await User.findById(req.user?._id)
+
     const video = await Video.create({
         videoFile: videoFile.url,
         thumbnail: thumbnail.url,
         title,
         description,
         duration: videoFile.duration,
-        owner: req.user?._id
+        owner: user
     })
 
     return res
@@ -114,11 +118,13 @@ const publishAVideo = asyncHandler(async (req, res) => {
 
 const getVideoById = asyncHandler(async (req, res) => {
     const { videoId } = req.params
+
+    const video = await Video.findById(videoId)
     
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
-            $push: { watchHistory: videoId }
+            $push: { watchHistory: video }
         },
         {new: true}
     )

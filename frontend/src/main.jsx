@@ -29,6 +29,9 @@ import TnC from './pages/TnC.jsx'
 import { Provider } from 'react-redux'
 import store from './store/store.js'
 import Playlist from './pages/Playlist.jsx'
+import LikedVideos from './pages/LikedVideos.jsx'
+import WatchHistory from './pages/WatchHistory.jsx'
+import Subscribers from './pages/Subscribers.jsx'
 
 const router = createBrowserRouter([
   {
@@ -195,6 +198,33 @@ const router = createBrowserRouter([
       {
         path: "/playlist/:list",
         element: <Playlist />
+      },
+      {
+        path: "/playlist/LL",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <LikedVideos />
+          </AuthLayout>
+        )
+      },
+      {
+        path: "/feed/history",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <WatchHistory />
+          </AuthLayout>
+        )
+      },
+      {
+        path: "/channel/:channel/subscribers",
+        element: (
+          <AuthLayout authentication>
+            {" "}
+            <Subscribers />
+          </AuthLayout>
+        )
       }
     ]
   }
@@ -205,5 +235,5 @@ createRoot(document.getElementById('root')).render(
     <Provider store={store}>
       <RouterProvider router={router} />
     </Provider>
-  </StrictMode>,
+  </StrictMode>
 )

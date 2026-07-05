@@ -3,16 +3,20 @@ import {Comment} from "../models/comment.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
+import { Video } from "../models/video.model.js"
+import { User } from "../models/user.model.js"
 
 const getVideoComments = asyncHandler(async (req, res) => {
     
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    const video = await Video.findById(videoId)
+
     const videoComments = await Comment.aggregate([
         {
             $match: {
-                video: videoId
+                video
             }
         },
         {
@@ -33,10 +37,14 @@ const getVideoComments = asyncHandler(async (req, res) => {
 const addComment = asyncHandler(async (req, res) => {
     const { content } = req.body
 
+    const video = await Video.findById(req.video?._id)
+
+    const owner = await User.findById(req.user?._id)
+
     const comment = await Comment.create({
         content,
-        video: req.video?._id,
-        owner: req.user?._id
+        video,
+        owner
     })
 
     return res

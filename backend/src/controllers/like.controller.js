@@ -3,12 +3,20 @@ import {Like} from "../models/like.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
+import { Video } from "../models/video.model.js"
+import { User } from "../models/user.model.js"
+import { Comment } from "../models/comment.model.js"
+import { Tweet } from "../models/tweet.model.js"
 
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params
+
+    const video = await Video.findById(videoId)
+
+    const user = await User.findById(req.user?._id)
     
     const existedLike = await Like.findOne({
-        $and: [{ video: videoId }, { likedBy: req.user?._id }]
+        $and: [{ video }, { likedBy: user }]
     })
 
     if(existedLike) {
@@ -22,8 +30,8 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
     else {
         const createdLike = await Like.create({
-            video: videoId,
-            likedBy: req.user?._id
+            video,
+            likedBy: user
         })
     
         return res
@@ -36,9 +44,13 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params
+
+    const comment = await Comment.findById(commentId)
+
+    const user = await User.findById(req.user?._id)
     
     const existedLike = await Like.findOne({
-        $and: [{ comment: commentId }, { likedBy: req.user?._id }]
+        $and: [{ comment }, { likedBy: user }]
     })
 
     if(existedLike) {
@@ -52,8 +64,8 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     }
     else {
         const createdLike = await Like.create({
-            comment: commentId,
-            likedBy: req.user?._id
+            comment,
+            likedBy: user
         })
     
         return res
@@ -67,9 +79,13 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
+
+    const tweet = await Tweet.findById(tweetId)
+
+    const user = await User.findById(req.user?._id)
     
     const existedLike = await Like.findOne({
-        $and: [{ tweet: tweetId }, { likedBy: req.user?._id }]
+        $and: [{ tweet }, { likedBy: user }]
     })
 
     if(existedLike) {
@@ -83,8 +99,8 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     }
     else {
         const createdLike = await Like.create({
-            tweet: tweetId,
-            likedBy: req.user?._id
+            tweet,
+            likedBy: user
         })
     
         return res
@@ -97,10 +113,12 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 )
 
 const getLikedVideos = asyncHandler(async (req, res) => {
+    const user = await User.findById(req.user?._id)
     
     const embeddedLikedVideos = await Like.aggregate([
         {
             $match: {
+                likedBy: user,
                 video: {
                     $ne: null,
                     $exists: true

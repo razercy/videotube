@@ -5,13 +5,15 @@ import {Like} from "../models/like.model.js"
 import {ApiError} from "../utils/ApiError.js"
 import {ApiResponse} from "../utils/ApiResponse.js"
 import {asyncHandler} from "../utils/asyncHandler.js"
+import { User } from "../models/user.model.js"
 
 const getChannelStats = asyncHandler(async (req, res) => {
+    const owner = await User.findById(req.user?._id)
     
     const totalVideoViews = await Video.aggregate([
         {
             $match: {
-                owner: req.user?._id
+                owner
             }
         },
         {
@@ -30,7 +32,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const totalSubscribers = await Subscription.aggregate([
         {
             $match: {
-                channel: req.user?._id
+                channel: owner
             }
         },
         {
@@ -49,7 +51,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const totalVideos = await Video.aggregate([
         {
             $match: {
-                owner: req.user?._id
+                owner
             }
         },
         {
@@ -68,7 +70,7 @@ const getChannelStats = asyncHandler(async (req, res) => {
     const totalLikes = await Video.aggregate([
         {
             $match: {
-                owner: req.user?._id
+                owner
             }
         },
         {
@@ -107,11 +109,12 @@ const getChannelStats = asyncHandler(async (req, res) => {
 })
 
 const getChannelVideos = asyncHandler(async (req, res) => {
+    const owner = await User.findById(req.user?._id)
     
     const videos = await Video.aggregate([
         {
             $match: {
-                owner: req.user?._id
+                owner
             }
         },
         {

@@ -13,6 +13,15 @@ import ChannelInfo from "./EditInfo/ChannelInfo";
 import ChgPassword from "./EditInfo/ChgPassword";
 import AuthLayout from "./AuthLayout";
 import Playlist from "./Playlist";
+import CardViewListing from "./CardViewListing";
+import ListViewListing from "./ListViewListing";
+import Dashboard from "./Dashboard";
+import Login from "./Login";
+import Signup from "./Signup";
+import PrivacyPolicy from "./PrivacyPolicy";
+import TnC from "./TnC";
+import Video from "./Video";
+import Subscribers from "./Subscribers";
 export {
     Header,
     Sidebar,
@@ -28,5 +37,14 @@ export {
     ChannelInfo,
     ChgPassword,
     AuthLayout,
-    Playlist
+    Playlist,
+    CardViewListing,
+    ListViewListing,
+    Dashboard,
+    Login,
+    Signup,
+    PrivacyPolicy,
+    TnC,
+    Video,
+    Subscribers
 }
