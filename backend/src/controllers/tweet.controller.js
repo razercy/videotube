@@ -9,11 +9,11 @@ const createTweet = asyncHandler(async (req, res) => {
     
     const { content } = req.body
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
 
     const tweet = await Tweet.create({
         content,
-        owner: user
+        owner: req.user?._id
     })
 
     return res
@@ -24,13 +24,15 @@ const createTweet = asyncHandler(async (req, res) => {
 })
 
 const getUserTweets = asyncHandler(async (req, res) => {
+    
+    const {userId} = req.params
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
     
     const userTweets = await Tweet.aggregate([
         {
             $match: {
-                owner: user
+                owner: userId
             }
         }
     ])

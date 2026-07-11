@@ -9,12 +9,12 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 const toggleSubscription = asyncHandler(async (req, res) => {
     const {channelId} = req.params
 
-    const channel = await User.findById(channelId)
+    // const channel = await User.findById(channelId)
 
-    const subscriber = await User.findById(req.user?._id)
+    // const subscriber = await User.findById(req.user?._id)
     
     const existedSubscription = await Subscription.findOne({
-        $and: [{ channel }, { subscriber }]
+        $and: [{ channel: channelId }, { subscriber: req.user?._id }]
     })
 
     if(existedSubscription) {
@@ -28,8 +28,8 @@ const toggleSubscription = asyncHandler(async (req, res) => {
     }
     else {
         const createdSubscription = await Subscription.create({
-            subscriber,
-            channel
+            subscriber: req.user?._id,
+            channel: channelId
         })
     
         return res
@@ -43,12 +43,12 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const {channelId} = req.params
-    const channel = await User.findById(channelId)
+    // const channel = await User.findById(channelId)
 
     const embeddedUserChannelSubscribers = await Subscription.aggregate([
         {
             $match: {
-                channel,
+                channel: channelId,
                 subscriber: {
                     $ne: null,
                     $exists: true
@@ -85,12 +85,12 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
     const { subscriberId } = req.params
-    const subscriber = await User.findById(subscriberId)
+    // const subscriber = await User.findById(subscriberId)
 
     const embeddedSubscribedChannels = await Subscription.aggregate([
         {
             $match: {
-                subscriber,
+                subscriber: subscriberId,
                 channel: {
                     $ne: null,
                     $exists: true
@@ -124,8 +124,55 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
     )
 })
 
+const isSubscribed = asyncHandler(async(req, res) => {
+    const { channelId } = req.params
+
+    const existedSubscription = await Subscription.findOne({
+        $and: [{ channel: channelId }, { subscriber: req.user?._id }]
+    })
+
+    if (existedSubscription) {
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200, true, "Subscription found successfully")
+        )
+    } else {
+        return res
+        .status(404)
+        .json(
+            new ApiResponse(404, false, "Subscription not found")
+        )
+    }
+})
+
+const getSubscriberCount = asyncHandler(async(req, res) => {
+    const { channelId } = req.params
+
+    const subscribers = await Subscription.aggregate([
+        {
+            $match: {
+                channel: channelId,
+                subscriber: {
+                    $ne: req.user?._id,
+                    $ne: null,
+                    $exists: true
+                }
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, subscribers.length, "Subscriber count fetched successfully")
+    )
+})
+
 export {
     toggleSubscription,
     getUserChannelSubscribers,
-    getSubscribedChannels
+    getSubscribedChannels,
+    isSubscribed,
+    getSubscriberCount
 }

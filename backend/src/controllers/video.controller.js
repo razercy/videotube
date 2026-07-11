@@ -27,12 +27,13 @@ const getAllVideos = asyncHandler(async (req, res) => {
         }
     }
     
-    const user = await User.findById(userId)
+    // const user = await User.findById(userId)
 
     const videos = trimmedQuery === "" ? [] : await Video.aggregate([
         {
             $match: {
-                owner: user,
+                owner: userId,
+                isPublished: true,
                 $or: [
                     { title: { trimmedQuery, $options: "i" } },
                     { title: { $regex: " " + trimmedQuery, $options: "i" } },
@@ -98,7 +99,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Error while uploading on thumbnail")
     }
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
 
     const video = await Video.create({
         videoFile: videoFile.url,
@@ -106,7 +107,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
         title,
         description,
         duration: videoFile.duration,
-        owner: user
+        owner: req.user?._id
     })
 
     return res
@@ -116,15 +117,15 @@ const publishAVideo = asyncHandler(async (req, res) => {
     )
 })
 
-const getVideoById = asyncHandler(async (req, res) => {
+const watchVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
-    const video = await Video.findById(videoId)
+    // const video = await Video.findById(videoId)
     
     const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
-            $push: { watchHistory: video }
+            $push: { watchHistory: videoId }
         },
         {new: true}
     )
@@ -140,6 +141,18 @@ const getVideoById = asyncHandler(async (req, res) => {
     return res
     .status(200)
     .json(
+        new ApiResponse(200, video, "Video opened successfully")
+    )
+})
+
+const getVideoById = asyncHandler(async (req, res) => {
+    const { videoId } = req.params
+
+    const video = await Video.findById(videoId)
+
+    return res
+    .status(200)
+    .json(
         new ApiResponse(200, video, "Video fetched successfully")
     )
 })
@@ -147,27 +160,27 @@ const getVideoById = asyncHandler(async (req, res) => {
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
-    const {title, description} = req.body
+    // const {title, description} = req.body
 
-    if (!title) {
-        throw new ApiError(400, "video title is required")
-    }
+    // if (!title) {
+    //     throw new ApiError(400, "video title is required")
+    // }
 
-    if (!description) {
-        throw new ApiError(400, "video description is required")
-    }
+    // if (!description) {
+    //     throw new ApiError(400, "video description is required")
+    // }
 
-    const videoFileLocalPath = req.files?.videoFile[0]?.path
+    // const videoFileLocalPath = req.files?.videoFile[0]?.path
 
-    if (!videoFileLocalPath) {
-        throw new ApiError(400, "Video file is missing")
-    }
+    // if (!videoFileLocalPath) {
+    //     throw new ApiError(400, "Video file is missing")
+    // }
 
-    const videoFile = await uploadOnCloudinary(videoFileLocalPath)
+    // const videoFile = await uploadOnCloudinary(videoFileLocalPath)
 
-    if (!videoFile.url) {
-        throw new ApiError(400, "Error while uploading on video file")
-    }
+    // if (!videoFile.url) {
+    //     throw new ApiError(400, "Error while uploading on video file")
+    // }
 
     const thumbnailLocalPath = req.files?.thumbnail[0]?.path
 
@@ -185,12 +198,12 @@ const updateVideo = asyncHandler(async (req, res) => {
         videoId,
         {
             $set: {
-                videoFile: videoFile.url,
+                // videoFile: videoFile.url,
                 thumbnail: thumbnail.url,
-                title,
-                description,
-                duration: videoFile.duration,
-                views: 0
+                // title,
+                // description,
+                // duration: videoFile.duration,
+                // views: 0
             }
         },
         {new: true}
@@ -252,11 +265,34 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     }
 })
 
+const getPublishedVideos = asyncHandler(async (req, res) => {
+    const { userId } = req.params
+
+    // const owner = await User.findById(userId)
+
+    const videos = await Video.aggregate([
+        {
+            $match: {
+                owner: userId,
+                isPublished: true
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, videos, "Videos fetched successfully")
+    )
+})
+
 export {
     getAllVideos,
     publishAVideo,
     getVideoById,
     updateVideo,
     deleteVideo,
-    togglePublishStatus
+    togglePublishStatus,
+    getPublishedVideos,
+    watchVideo
 }

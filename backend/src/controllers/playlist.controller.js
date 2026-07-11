@@ -10,13 +10,13 @@ import { Video } from "../models/video.model.js"
 const createPlaylist = asyncHandler(async (req, res) => {
     const {name, description} = req.body
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
 
     const playlist = await Playlist.create({
         name,
         description,
         videos: [],
-        owner: user
+        owner: req.user?._id
     })
 
     return res
@@ -29,12 +29,12 @@ const createPlaylist = asyncHandler(async (req, res) => {
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const {userId} = req.params
 
-    const user = await User.findById(userId)
+    // const user = await User.findById(userId)
     
     const userPlaylists = await Playlist.aggregate([
         {
             $match: {
-                owner: user
+                owner: userId
             }
         }
     ])
@@ -61,12 +61,12 @@ const getPlaylistById = asyncHandler(async (req, res) => {
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
-    const video = await Video.findById(videoId)
+    // const video = await Video.findById(videoId)
 
     const playlist = await Playlist.findByIdAndUpdate(
         playlistId,
         {
-            $push: { videos: video }
+            $push: { videos: videoId }
         },
         {new: true}
     )
@@ -81,12 +81,12 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
     const {playlistId, videoId} = req.params
 
-    const video = await Video.findById(videoId)
+    // const video = await Video.findById(videoId)
     
     const playlist = await Playlist.findByIdAndUpdate(
         playlistId,
         {
-            $pull: { videos: video }
+            $pull: { videos: videoId }
         },
         {new: true}
     )

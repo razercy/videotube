@@ -4,10 +4,6 @@ import ChannelVideos from "./Channel/Videos";
 import ChannelPlaylist from "./Channel/Playlist";
 import ChannelTweets from "./Channel/Tweets";
 import ChannelSubscribed from "./Channel/Subscribed";
-import MyChannelVideos from "./MyChannel/Videos";
-import MyChannelPlaylist from "./MyChannel/Playlist";
-import MyChannelTweets from "./MyChannel/Tweets";
-import MyChannelSubscribed from "./MyChannel/Subscribed";
 import PersonalInfo from "./EditInfo/PersonalInfo";
 import ChannelInfo from "./EditInfo/ChannelInfo";
 import ChgPassword from "./EditInfo/ChgPassword";
@@ -22,6 +18,8 @@ import PrivacyPolicy from "./PrivacyPolicy";
 import TnC from "./TnC";
 import Video from "./Video";
 import Subscribers from "./Subscribers";
+import UploadVideo from "./UploadVideo";
+import Channel from "./Channel/Channel";
 export {
     Header,
     Sidebar,
@@ -29,10 +27,6 @@ export {
     ChannelPlaylist,
     ChannelTweets,
     ChannelSubscribed,
-    MyChannelVideos,
-    MyChannelPlaylist,
-    MyChannelTweets,
-    MyChannelSubscribed,
     PersonalInfo,
     ChannelInfo,
     ChgPassword,
@@ -46,5 +40,7 @@ export {
     PrivacyPolicy,
     TnC,
     Video,
-    Subscribers
+    Subscribers,
+    UploadVideo,
+    Channel
 }

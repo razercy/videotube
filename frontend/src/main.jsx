@@ -55,28 +55,28 @@ const router = createBrowserRouter([
           </AuthLayout>
         )
       },
-      // {
-      //   path: "/:channel",
-      //   element: <Channel />,
-      //   children: [
-      //     // {
-      //     //   path: "/videos",
-      //     //   element: <ChannelVideos />
-      //     // },
-      //     // {
-      //     //   path: "/playlist",
-      //     //   element: <ChannelPlaylist />
-      //     // },
-      //     // {
-      //     //   path: "/tweets",
-      //     //   element: <ChannelTweets />
-      //     // },
-      //     {
-      //       path: "/subscribed",
-      //       element: <ChannelSubscribed />
-      //     }
-      //   ]
-      // },
+      {
+        path: "/:channel",
+        element: <Channel />,
+        children: [
+          {
+            path: "/videos",
+            element: <ChannelVideos />
+          },
+          {
+            path: "/playlist",
+            element: <ChannelPlaylist />
+          },
+          {
+            path: "/tweets",
+            element: <ChannelTweets />
+          },
+          {
+            path: "/subscribed",
+            element: <ChannelSubscribed />
+          }
+        ]
+      },
       {
         path: "/login",
         element: (

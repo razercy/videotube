@@ -251,6 +251,16 @@ const getCurrentUser = asyncHandler(async(req, res) => {
     .json(new ApiResponse(200, req.user, "current user fetched successfully"))
 })
 
+const getUserById = asyncHandler(async(req, res) => {
+    const { userId } = req.params
+
+    const user = await User.findById(userId)
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, user, "User fetched successfully"))
+})
+
 const updateAccountDetails = asyncHandler(async(req, res) => {
     const {fullName, email} = req.body
 
@@ -476,5 +486,6 @@ export {
     updateUserAvatar,
     updateUserCoverImage,
     getUserChannelProfile,
-    getWatchHistory
+    getWatchHistory,
+    getUserById
 }

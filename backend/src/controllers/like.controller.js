@@ -11,12 +11,12 @@ import { Tweet } from "../models/tweet.model.js"
 const toggleVideoLike = asyncHandler(async (req, res) => {
     const {videoId} = req.params
 
-    const video = await Video.findById(videoId)
+    // const video = await Video.findById(videoId)
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
     
     const existedLike = await Like.findOne({
-        $and: [{ video }, { likedBy: user }]
+        $and: [{ video: videoId }, { likedBy: req.user?._id }]
     })
 
     if(existedLike) {
@@ -30,8 +30,8 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
     else {
         const createdLike = await Like.create({
-            video,
-            likedBy: user
+            video: videoId,
+            likedBy: req.user?._id
         })
     
         return res
@@ -45,12 +45,12 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params
 
-    const comment = await Comment.findById(commentId)
+    // const comment = await Comment.findById(commentId)
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
     
     const existedLike = await Like.findOne({
-        $and: [{ comment }, { likedBy: user }]
+        $and: [{ comment: commentId }, { likedBy: req.user?._id }]
     })
 
     if(existedLike) {
@@ -64,8 +64,8 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     }
     else {
         const createdLike = await Like.create({
-            comment,
-            likedBy: user
+            comment: commentId,
+            likedBy: req.user?._id
         })
     
         return res
@@ -80,12 +80,12 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
 const toggleTweetLike = asyncHandler(async (req, res) => {
     const {tweetId} = req.params
 
-    const tweet = await Tweet.findById(tweetId)
+    // const tweet = await Tweet.findById(tweetId)
 
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
     
     const existedLike = await Like.findOne({
-        $and: [{ tweet }, { likedBy: user }]
+        $and: [{ tweet: tweetId }, { likedBy: req.user?._id }]
     })
 
     if(existedLike) {
@@ -99,8 +99,8 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     }
     else {
         const createdLike = await Like.create({
-            tweet,
-            likedBy: user
+            tweet: tweetId,
+            likedBy: req.user?._id
         })
     
         return res
@@ -112,13 +112,58 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
 }
 )
 
+const isTweetLiked = asyncHandler(async(req, res) => {
+    const { tweetId } = req.params
+
+    const existedLike = await Like.findOne({
+        $and: [{ tweet: tweetId }, { likedBy: req.user?._id }]
+    })
+
+    if (existedLike) {
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200, true, "Like found successfully")
+        )
+    } else {
+        return res
+        .status(404)
+        .json(
+            new ApiResponse(404, false, "Like not found")
+        )
+    }
+})
+
+const getTweetLikeCount = asyncHandler(async(req, res) => {
+    const { tweetId } = req.params
+
+    const tweetLikes = await Like.aggregate([
+        {
+            $match: {
+                tweet: tweetId,
+                likedBy: {
+                    $ne: req.user?._id,
+                    $ne: null,
+                    $exists: true
+                }
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, tweetLikes.length, "Tweet like count fetched successfully")
+    )
+})
+
 const getLikedVideos = asyncHandler(async (req, res) => {
-    const user = await User.findById(req.user?._id)
+    // const user = await User.findById(req.user?._id)
     
     const embeddedLikedVideos = await Like.aggregate([
         {
             $match: {
-                likedBy: user,
+                likedBy: req.user?._id,
                 video: {
                     $ne: null,
                     $exists: true
@@ -161,5 +206,7 @@ export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
+    isTweetLiked,
+    getTweetLikeCount,
     getLikedVideos
 }
