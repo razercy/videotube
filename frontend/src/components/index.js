@@ -20,6 +20,9 @@ import Video from "./Video";
 import Subscribers from "./Subscribers";
 import UploadVideo from "./UploadVideo";
 import Channel from "./Channel/Channel";
+import EditInfo from "./EditInfo/EditInfo";
+import { EditInfoProvider } from "./EditInfo/EditInfo";
+import { useFullName } from "./EditInfo/EditInfo";
 export {
     Header,
     Sidebar,
@@ -42,5 +45,8 @@ export {
     Video,
     Subscribers,
     UploadVideo,
-    Channel
+    Channel,
+    EditInfo,
+    EditInfoProvider,
+    useFullName
 }

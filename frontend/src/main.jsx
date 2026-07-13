@@ -158,15 +158,15 @@ const router = createBrowserRouter([
               </AuthLayout>
             )
           },
-          {
-            path: "/username",
-            element: (
-              <AuthLayout authentication>
-                {" "}
-                <ChannelInfo />
-              </AuthLayout>
-            )
-          },
+          // {
+          //   path: "/username",
+          //   element: (
+          //     <AuthLayout authentication>
+          //       {" "}
+          //       <ChannelInfo />
+          //     </AuthLayout>
+          //   )
+          // },
           {
             path: "/password",
             element: (
