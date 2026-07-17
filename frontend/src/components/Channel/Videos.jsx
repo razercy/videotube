@@ -1,42 +1,69 @@
 import axios from 'axios'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useSelector } from 'react-redux';
-import { formatDuration } from '../../helpers/formatDuration.js';
-import { timeAgo } from '../../helpers/timeAgo';
-import { useLocation, useNavigate } from 'react-router-dom';
-import UploadVideo from '../index.js';
+import { formatDuration } from '../../helpers/formatDuration.js'
+import { timeAgo } from '../../helpers/timeAgo.js'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { UploadVideo } from '../index.js'
+
+const AUTH_REQUEST_CONFIG = {
+  withCredentials: true,
+}
+
+const safeDecodeURIComponent = (value) => {
+  if (!value) {
+    return ''
+  }
+
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
 
 function Videos() {
-  const authUserData = useSelector((state) => state.auth.userData)
   const navigate = useNavigate()
   const location = useLocation()
   const [uploadVideoModalPopup, setUploadVideoModalPopup] = useState(false)
   const [videos, setVideos] = useState([])
-  const [isLoadingVideos, setIsLoadingVideos] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState('')
 
-  const pathSegments = useMemo(
-    () => location.pathname.split("/").filter(Boolean),
-    [location.pathname]
+  const pathSegment = useMemo(() => {
+    const parts = location.pathname.split('/').filter(Boolean)
+    return parts[0] || ''
+  }, [location.pathname])
+
+  const isOwnChannel = pathSegment === 'channel'
+  const decodedChannelId = useMemo(
+    () => (isOwnChannel ? '' : safeDecodeURIComponent(pathSegment)),
+    [isOwnChannel, pathSegment]
   )
 
-  const isOwnChannelRoute = pathSegments[0] === "channel"
-
   useEffect(() => {
+    const controller = new AbortController()
+    const requestConfig = {
+      ...AUTH_REQUEST_CONFIG,
+      signal: controller.signal,
+    }
     let isMounted = true
 
-    const fetchVideos = async () => {
-      setIsLoadingVideos(true)
-      try {
-        let channelId = null
+    const getResponseData = (response) => response?.data?.data ?? response?.data ?? null
 
-        if (isOwnChannelRoute) {
-          const currentUserResponse = await axios.get("/api/v1/users/current-user")
-          channelId = currentUserResponse?.data?.data?._id || null
-        } else {
-          channelId = pathSegments[0] ? decodeURIComponent(pathSegments[0]) : null
+    const fetchChannelVideos = async () => {
+      setIsLoading(true)
+      setErrorMessage('')
+
+      try {
+        let resolvedChannelId = decodedChannelId
+
+        if (isOwnChannel) {
+          const channelResponse = await axios.get('/api/v1/users/current-user', requestConfig)
+          const channelData = getResponseData(channelResponse)
+          resolvedChannelId = channelData?._id || ''
         }
 
-        if (!channelId) {
+        if (!resolvedChannelId) {
           if (isMounted) {
             setVideos([])
           }
@@ -44,31 +71,37 @@ function Videos() {
         }
 
         const channelVideosResponse = await axios.get(
-          `/api/v1/videos/user/${encodeURIComponent(channelId)}`
+          `/api/v1/videos/user/${encodeURIComponent(resolvedChannelId)}`,
+          requestConfig
         )
-
-        const fetchedVideos = channelVideosResponse?.data?.data
+        const channelVideos = getResponseData(channelVideosResponse)
 
         if (isMounted) {
-          setVideos(Array.isArray(fetchedVideos) ? fetchedVideos : [])
+          setVideos(Array.isArray(channelVideos) ? channelVideos : [])
         }
       } catch (error) {
+        if (error?.code === 'ERR_CANCELED') {
+          return
+        }
+
         if (isMounted) {
           setVideos([])
+          setErrorMessage('Failed to load channel videos.')
         }
       } finally {
         if (isMounted) {
-          setIsLoadingVideos(false)
+          setIsLoading(false)
         }
       }
     }
 
-    fetchVideos()
+    fetchChannelVideos()
 
     return () => {
       isMounted = false
+      controller.abort()
     }
-  }, [authUserData?._id, isOwnChannelRoute, pathSegments])
+  }, [decodedChannelId, isOwnChannel])
 
   return (
     <div className="h-screen overflow-y-auto bg-[#121212] text-white">
@@ -76,9 +109,16 @@ function Videos() {
         <section className="w-full pb-17.5 sm:ml-17.5 sm:pb-0 lg:ml-0">
           <div className="px-4 pb-4">
             {
-              isLoadingVideos ? (
-                <h1>Loading...</h1>
-              ) : (
+              isLoading
+              ? <h1>Loading...</h1>
+              : null
+            }
+            {
+              errorMessage
+              ? <p className="pb-2 text-sm text-red-400">{errorMessage}</p>
+              : null
+            }
+            {
               videos.length > 0 ? (
                 <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 pt-2">
                   {
@@ -126,7 +166,7 @@ function Videos() {
                     <h5 className="mb-2 font-semibold">No videos uploaded</h5>
                     <p>This page is yet to upload a video. Search another page in order to find more videos.</p>
                     {
-                      isOwnChannelRoute
+                      isOwnChannel
                       && (
                         <button
                         onClick={() => setUploadVideoModalPopup(true)}
@@ -151,11 +191,10 @@ function Videos() {
                   </div>
                 </div>
               )
-              )
             }
           </div>
           {
-            uploadVideoModalPopup && <UploadVideo />
+            uploadVideoModalPopup && <UploadVideo videos={videos} setVideos={setVideos} />
           }
         </section>
       </div>

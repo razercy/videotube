@@ -160,15 +160,15 @@ const getVideoById = asyncHandler(async (req, res) => {
 const updateVideo = asyncHandler(async (req, res) => {
     const { videoId } = req.params
 
-    // const {title, description} = req.body
+    const {title, description} = req.body
 
-    // if (!title) {
-    //     throw new ApiError(400, "video title is required")
-    // }
+    if (!title) {
+        throw new ApiError(400, "video title is required")
+    }
 
-    // if (!description) {
-    //     throw new ApiError(400, "video description is required")
-    // }
+    if (!description) {
+        throw new ApiError(400, "video description is required")
+    }
 
     // const videoFileLocalPath = req.files?.videoFile[0]?.path
 
@@ -200,8 +200,8 @@ const updateVideo = asyncHandler(async (req, res) => {
             $set: {
                 // videoFile: videoFile.url,
                 thumbnail: thumbnail.url,
-                // title,
-                // description,
+                title,
+                description,
                 // duration: videoFile.duration,
                 // views: 0
             }

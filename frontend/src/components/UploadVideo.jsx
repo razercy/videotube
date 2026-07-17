@@ -1,7 +1,11 @@
 import axios from 'axios'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
-function UploadVideo() {
+const AUTH_REQUEST_CONFIG = {
+    withCredentials: true,
+}
+
+function UploadVideo({ videos, setVideos }) {
     const [videoFile, setVideoFile] = useState(null)
     const [thumbnail, setThumbnail] = useState(null)
     const [title, setTitle] = useState("")
@@ -9,28 +13,94 @@ function UploadVideo() {
     const [saved, setSaved] = useState(false)
     const [uploading, setUploading] = useState(false)
     const [cancelled, setCancelled] = useState(false)
-    const [video, setVideo] = useState({})
-    const uploadControllerRef = useRef(null)
+    const [video, setVideo] = useState(null)
+    const [uploadError, setUploadError] = useState('')
+    const [uploadController, setUploadController] = useState(null)
+    const isMountedRef = useRef(true)
 
-    const formatFileSize = (file) => {
-        if (!file?.size) {
-            return "0 MB"
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false
+        }
+    }, [])
+
+    const getResponseData = (response) => response?.data?.data ?? response?.data ?? null
+
+    const getVideoSizeLabel = () => {
+        if (!videoFile?.size) {
+            return '0.00 MB'
         }
 
-        return `${(file.size / (1024 * 1024)).toFixed(2)} MB`
+        return `${(videoFile.size / (1024 * 1024)).toFixed(2)} MB`
     }
 
-    const cancelActiveUpload = () => {
-        if (uploadControllerRef.current) {
-            uploadControllerRef.current.abort()
-            uploadControllerRef.current = null
+    const handleSave = async () => {
+        if (!videoFile || !thumbnail || !title || !description) {
+            setUploadError('Please fill in all required fields before saving.')
+            return
+        }
+
+        setUploadError('')
+        setSaved(true)
+        setUploading(true)
+
+        const controller = new AbortController()
+        setUploadController(controller)
+
+        try {
+            const formData = new FormData()
+            formData.append('title', title)
+            formData.append('description', description)
+            formData.append('videoFile', videoFile)
+            formData.append('thumbnail', thumbnail)
+
+            const videoResponse = await axios.post('/api/v1/videos', formData, {
+                ...AUTH_REQUEST_CONFIG,
+                signal: controller.signal,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            })
+
+            const createdVideo = getResponseData(videoResponse)
+
+            if (!createdVideo || typeof createdVideo !== 'object' || !createdVideo._id) {
+                throw new Error('Invalid upload response')
+            }
+
+            if (!isMountedRef.current) {
+                return
+            }
+
+            setVideo(createdVideo)
+        } catch (error) {
+            if (!isMountedRef.current) {
+                return
+            }
+
+            if (error?.code === 'ERR_CANCELED') {
+                setUploadError('Upload cancelled.')
+            } else {
+                setUploadError('Failed to upload video.')
+            }
+
+            setVideo(null)
+            setSaved(false)
+        } finally {
+            if (!isMountedRef.current) {
+                return
+            }
+
+            setUploading(false)
+            setUploadController(null)
         }
     }
 
-    const handleCloseUploader = () => {
-        cancelActiveUpload()
-        setUploading(false)
-        setSaved(false)
+    const handleCancelUpload = () => {
+        if (uploadController) {
+            uploadController.abort()
+        }
+
         setCancelled(true)
     }
 
@@ -41,60 +111,44 @@ function UploadVideo() {
         }
 
         try {
-            await axios.delete(`/api/v1/videos/${video._id}`)
+            await axios.delete(
+                `/api/v1/videos/${encodeURIComponent(video._id)}`,
+                AUTH_REQUEST_CONFIG
+            )
+
+            if (!isMountedRef.current) {
+                return
+            }
+
             setCancelled(true)
-        } catch (error) {
-            setCancelled(false)
+        } catch {
+            if (!isMountedRef.current) {
+                return
+            }
+
+            setUploadError('Unable to delete uploaded video.')
         }
     }
 
-    const handleSaveVideo = async () => {
-        if (!videoFile || !thumbnail || !title || !description) {
+    const handleFinish = () => {
+        if (!video || !video._id) {
+            setUploadError('Upload is not complete yet.')
             return
         }
 
-        const controller = new AbortController()
-        uploadControllerRef.current = controller
-        setUploading(true)
-
-        try {
-            const formData = new FormData()
-            formData.append("title", title)
-            formData.append("description", description)
-            formData.append("videoFile", videoFile)
-            formData.append("thumbnail", thumbnail)
-
-            const response = await axios.post(
-                "/api/v1/videos",
-                formData,
-                {
-                    headers: {
-                        "Content-Type": "multipart/form-data",
-                    },
-                    signal: controller.signal,
-                }
-            )
-
-            const uploadedVideo = response?.data?.data
-            setVideo(uploadedVideo || {})
-            setSaved(true)
-        } catch (error) {
-            setSaved(false)
-            if (error?.code !== "ERR_CANCELED") {
-                console.error(error)
-            }
-        } finally {
-            setUploading(false)
-            uploadControllerRef.current = null
-        }
+        setVideos((prevVideos) => [...prevVideos, video])
+        setCancelled(true)
     }
 
   return cancelled
   ? (<></>)
   : (
-        uploading
+    saved
     ? (
+        uploading
+        ? (
             <div className="absolute inset-x-0 top-0 z-10 flex h-[calc(100vh-66px)] items-center justify-center bg-black/50 px-4 pb-21.5 pt-4 sm:h-[calc(100vh-82px)] sm:px-14 sm:py-8">
+                <h1>Loading...</h1>
                 <div className="w-full max-w-lg overflow-auto rounded-lg border border-gray-700 bg-[#121212] p-4">
                     <div className="mb-4 flex items-start justify-between">
                         <h2 className="text-xl font-semibold">
@@ -102,7 +156,7 @@ function UploadVideo() {
                             <span className="block text-sm text-gray-300">Track your video uploading process.</span>
                         </h2>
                         <button
-                                                onClick={handleCloseUploader}
+                        onClick={handleCancelUpload}
                         className="h-6 w-6">
                             <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -136,8 +190,8 @@ function UploadVideo() {
                             </span>
                         </div>
                         <div className="flex flex-col">
-                            <h6>{videoFile.name}</h6>
-                            <p className="text-sm">{formatFileSize(videoFile)}</p>
+                            <h6>{videoFile?.name || ''}</h6>
+                            <p className="text-sm">{getVideoSizeLabel()}</p>
                             <div className="mt-2">
                                 <svg
                                     aria-hidden="true"
@@ -159,7 +213,7 @@ function UploadVideo() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                         <button
-                        onClick={handleCloseUploader}
+                        onClick={handleCancelUpload}
                         className="border px-4 py-3">Cancel</button>
                         <button
                             className="bg-[#ae7aff] px-4 py-3 text-black disabled:bg-[#E4D3FF]"
@@ -169,15 +223,16 @@ function UploadVideo() {
                     </div>
                 </div>
             </div>
-    )
-    : saved
-    ? (
+        )
+        : (
             <div className="absolute inset-x-0 top-0 z-10 flex h-[calc(100vh-66px)] items-center justify-center bg-black/50 px-4 pb-21.5 pt-4 sm:h-[calc(100vh-82px)] sm:px-14 sm:py-8">
                 <div className="w-full max-w-lg overflow-auto rounded-lg border border-gray-700 bg-[#121212] p-4">
                     <div className="mb-4 flex items-start justify-between">
                         <h2 className="text-xl font-semibold">
                             Uploaded Video
-                            <span className="block text-sm text-gray-300">Track your video uploading process.</span>
+                            <span className="block text-sm text-gray-300">
+                                Track your video uploading process.
+                            </span>
                         </h2>
                         <button
                         onClick={handleDeleteUploadedVideo}
@@ -196,6 +251,7 @@ function UploadVideo() {
                             </svg>
                         </button>
                     </div>
+
                     <div className="mb-6 flex gap-x-2 border p-3">
                         <div className="w-8 shrink-0">
                             <span className="inline-block w-full rounded-full bg-[#E4D3FF] p-1 text-[#AE7AFF]">
@@ -213,9 +269,11 @@ function UploadVideo() {
                                 </svg>
                             </span>
                         </div>
+
                         <div className="flex flex-col">
-                            <h6>{videoFile.name}</h6>
-                            <p className="text-sm">{formatFileSize(videoFile)}</p>
+                            <h6>{videoFile?.name || ''}</h6>
+                            <p className="text-sm">{getVideoSizeLabel()}</p>
+
                             <div className="mt-2 flex items-center">
                                 <span className="mr-2 inline-block w-6 text-[#ae7aff]">
                                     <svg
@@ -236,25 +294,41 @@ function UploadVideo() {
                     <div className="grid grid-cols-2 gap-4">
                         <button
                         onClick={handleDeleteUploadedVideo}
-                        className="border px-4 py-3">Cancel</button>
+                        className="border px-4 py-3">
+                            Cancel
+                        </button>
+
                         <button
-                        onClick={() => setCancelled(true)}
-                        className="bg-[#ae7aff] px-4 py-3 text-black disabled:bg-[#E4D3FF]">Finish</button>
+                        onClick={handleFinish}
+                        className="bg-[#ae7aff] px-4 py-3 text-black disabled:bg-[#E4D3FF]">
+                            Finish
+                        </button>
                     </div>
                 </div>
             </div>
+        )
     )
     : (
         <div className="absolute inset-0 z-10 bg-black/50 px-4 pb-21.5 pt-4 sm:px-14 sm:py-8">
             <div className="h-full overflow-auto border bg-[#121212]">
                 <div className="flex items-center justify-between border-b p-4">
-                    <h2 className="text-xl font-semibold">Upload Videos</h2>
+                    <h2 className="text-xl font-semibold">
+                        Upload Videos
+                    </h2>
+
                     <button
-                        onClick={handleSaveVideo}
+                        onClick={handleSave}
                         className="group/btn mr-1 flex w-auto items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-1.25 active:translate-y-1.25 active:shadow-[0px_0px_0px_0px_#4f4e4e]">
                         Save
                     </button>
                 </div>
+
+                {
+                    uploadError
+                    ? <p className="px-4 py-2 text-sm text-red-400">{uploadError}</p>
+                    : null
+                }
+
                 <div className="mx-auto flex w-full max-w-3xl flex-col gap-y-4 p-4">
                     <div className="w-full border-2 border-dashed px-4 py-12 text-center">
                         <span className="mb-4 inline-block w-24 rounded-full bg-[#E4D3FF] p-4 text-[#AE7AFF]">
@@ -271,11 +345,19 @@ function UploadVideo() {
                                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"></path>
                             </svg>
                         </span>
-                        <h6 className="mb-2 font-semibold">Drag and drop video files to upload</h6>
-                        <p className="text-gray-400">Your videos will be private until you publish them.</p>
+
+                        <h6 className="mb-2 font-semibold">
+                            Drag and drop video files to upload
+                        </h6>
+
+                        <p className="text-gray-400">
+                            Your videos will be private until you publish them.
+                        </p>
+
                         <label
                         htmlFor="upload-video"
                         className="group/btn mt-4 inline-flex w-auto cursor-pointer items-center gap-x-2 bg-[#ae7aff] px-3 py-2 text-center font-bold text-black shadow-[5px_5px_0px_0px_#4f4e4e] transition-all duration-150 ease-in-out active:translate-x-1.25 active:translate-y-1.25 active:shadow-[0px_0px_0px_0px_#4f4e4e]">
+
                             <input
                                 type="file"
                                 id="upload-video"
@@ -283,6 +365,7 @@ function UploadVideo() {
                                     setVideoFile(e.target.files[0])
                                 }}
                                 className="sr-only" />
+
                             Select Files
                         </label>
                     </div>
@@ -293,6 +376,7 @@ function UploadVideo() {
                             Thumbnail
                             <sup>*</sup>
                         </label>
+
                         <input
                         id="thumbnail"
                         type="file"
@@ -301,6 +385,7 @@ function UploadVideo() {
                         }}
                         className="w-full border p-1 file:mr-4 file:border-none file:bg-[#ae7aff] file:px-3 file:py-1.5" />
                     </div>
+
                     <div className="w-full">
                         <label
                         htmlFor="title"
@@ -308,12 +393,14 @@ function UploadVideo() {
                             Title
                             <sup>*</sup>
                         </label>
+
                         <input
                         id="title"
                         type="text"
                         onChange={(e) => setTitle(e.target.value)}
                         className="w-full border bg-transparent px-2 py-1 outline-none" />
                     </div>
+
                     <div className="w-full">
                         <label
                         htmlFor="desc"
@@ -321,6 +408,7 @@ function UploadVideo() {
                             Description
                             <sup>*</sup>
                         </label>
+
                         <textarea
                         id="desc"
                         onChange={(e) => setDescription(e.target.value)}

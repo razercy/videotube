@@ -42,6 +42,28 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     }
 })
 
+const isVideoLiked = asyncHandler(async(req, res) => {
+    const { videoId } = req.params
+
+    const existedLike = await Like.findOne({
+        $and: [{ video: videoId }, { likedBy: req.user?._id }]
+    })
+
+    if (existedLike) {
+        return res
+        .status(200)
+        .json(
+            new ApiResponse(200, existedLike, "Like found successfully")
+        )
+    } else {
+        return res
+        .status(404)
+        .json(
+            new ApiResponse(404, false, "Like not found")
+        )
+    }
+})
+
 const toggleCommentLike = asyncHandler(async (req, res) => {
     const {commentId} = req.params
 
@@ -202,11 +224,35 @@ const getLikedVideos = asyncHandler(async (req, res) => {
     )
 })
 
+const getVideoLikeCountUserInc = asyncHandler(async(req, res) => {
+    const { videoId } = req.params
+
+    const videoLikes = await Like.aggregate([
+        {
+            $match: {
+                video: videoId,
+                likedBy: {
+                    $ne: null,
+                    $exists: true
+                }
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, videoLikes.length, "Video like count including current user fetched successfully")
+    )
+})
+
 export {
     toggleCommentLike,
     toggleTweetLike,
     toggleVideoLike,
     isTweetLiked,
     getTweetLikeCount,
-    getLikedVideos
+    getLikedVideos,
+    isVideoLiked,
+    getVideoLikeCountUserInc
 }
