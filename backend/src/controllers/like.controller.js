@@ -246,6 +246,29 @@ const getVideoLikeCountUserInc = asyncHandler(async(req, res) => {
     )
 })
 
+const getVideoLikeCount = asyncHandler(async(req, res) => {
+    const { videoId } = req.params
+
+    const videoLikes = await Like.aggregate([
+        {
+            $match: {
+                video: videoId,
+                likedBy: {
+                    $ne: req.user?._id,
+                    $ne: null,
+                    $exists: true
+                }
+            }
+        }
+    ])
+
+    return res
+    .status(200)
+    .json(
+        new ApiResponse(200, videoLikes.length, "Video like count including current user fetched successfully")
+    )
+})
+
 export {
     toggleCommentLike,
     toggleTweetLike,
@@ -254,5 +277,6 @@ export {
     getTweetLikeCount,
     getLikedVideos,
     isVideoLiked,
-    getVideoLikeCountUserInc
+    getVideoLikeCountUserInc,
+    getVideoLikeCount
 }

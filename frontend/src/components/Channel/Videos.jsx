@@ -125,7 +125,18 @@ function Videos() {
                     videos.map((video) => (
                       <div
                       key={video._id}
-                      onClick={() => navigate(`/watch/${encodeURIComponent(video._id)}`)}
+                      onClick={async () => {
+                        try {
+                          await axios.patch(
+                            `/api/v1/videos/video/${encodeURIComponent(video._id)}`,
+                            {},
+                            AUTH_REQUEST_CONFIG
+                          )
+                        } catch {
+                        } finally {
+                          navigate(`/watch/${encodeURIComponent(video._id)}`)
+                        }
+                      }}
                       className="w-full">
                         <div className="relative mb-2 w-full pt-[56%]">
                           <div className="absolute inset-0">
