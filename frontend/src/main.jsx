@@ -60,19 +60,19 @@ const router = createBrowserRouter([
         element: <Channel />,
         children: [
           {
-            path: "/videos",
+            path: "videos",
             element: <ChannelVideos />
           },
           {
-            path: "/playlist",
+            path: "playlist",
             element: <ChannelPlaylist />
           },
           {
-            path: "/tweets",
+            path: "tweets",
             element: <ChannelTweets />
           },
           {
-            path: "/subscribed",
+            path: "subscribed",
             element: <ChannelSubscribed />
           }
         ]
@@ -103,7 +103,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "/videos",
+            path: "videos",
             element: (
               <AuthLayout authentication>
                 {" "}
@@ -112,7 +112,7 @@ const router = createBrowserRouter([
             )
           },
           {
-            path: "/playlist",
+            path: "playlist",
             element: (
               <AuthLayout authentication>
                 {" "}
@@ -121,7 +121,7 @@ const router = createBrowserRouter([
             )
           },
           {
-            path: "/tweets",
+            path: "tweets",
             element: (
               <AuthLayout authentication>
                 {" "}
@@ -130,7 +130,7 @@ const router = createBrowserRouter([
             )
           },
           {
-            path: "/subscribed",
+            path: "subscribed",
             element: (
               <AuthLayout authentication>
                 {" "}
@@ -150,7 +150,7 @@ const router = createBrowserRouter([
         ),
         children: [
           {
-            path: "/contact-info",
+            path: "contact-info",
             element: (
               <AuthLayout authentication>
                 {" "}
@@ -159,7 +159,7 @@ const router = createBrowserRouter([
             )
           },
           // {
-          //   path: "/username",
+          //   path: "username",
           //   element: (
           //     <AuthLayout authentication>
           //       {" "}
@@ -168,7 +168,7 @@ const router = createBrowserRouter([
           //   )
           // },
           {
-            path: "/password",
+            path: "password",
             element: (
               <AuthLayout authentication>
                 {" "}

@@ -7,6 +7,8 @@ const AUTH_REQUEST_CONFIG = {
   withCredentials: true,
 }
 
+const OBJECT_ID_REGEX = /^[a-f\d]{24}$/i
+
 function Subscribed() {
   const authStatus = useSelector((state) => state.auth.status)
   const authUserData = useSelector((state) => state.auth.userData)
@@ -61,9 +63,22 @@ function Subscribed() {
             subscriberId = currentUserResponse?.data?.data?._id || null
           }
         } else {
-          subscriberId = channelRouteSegment
+          const decodedChannelSegment = channelRouteSegment
             ? decodeURIComponent(channelRouteSegment)
             : null
+
+          if (!decodedChannelSegment) {
+            subscriberId = null
+          } else if (OBJECT_ID_REGEX.test(decodedChannelSegment)) {
+            subscriberId = decodedChannelSegment
+          } else {
+            const channelProfileResponse = await axios.get(
+              `/api/v1/users/c/${encodeURIComponent(decodedChannelSegment)}`,
+              requestConfig
+            )
+
+            subscriberId = channelProfileResponse?.data?.data?._id || null
+          }
         }
 
         if (!subscriberId) {

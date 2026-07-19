@@ -104,7 +104,7 @@ function Channel() {
                 )
 
                 const subscribeeListPromise = axios.get(
-                    `/api/v1/subscriptions/c/${encodeURIComponent(resolvedChannelId)}`,
+                    `/api/v1/subscriptions/u/${encodeURIComponent(resolvedChannelId)}`,
                     requestConfig
                 )
 
