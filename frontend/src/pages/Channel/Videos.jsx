@@ -1,8 +1,9 @@
 import React from 'react'
+import { ChannelVideos } from '../../components/index.js'
 
 function Videos() {
   return (
-    <div>Videos</div>
+    <ChannelVideos />
   )
 }
 

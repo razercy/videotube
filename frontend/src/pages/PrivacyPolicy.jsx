@@ -1,9 +1,13 @@
 import React from 'react'
+import { Header, PrivacyPolicy as PrivacyPolicyComponent } from '../components/index.js'
 
-function PrivacyPolicy() {
+function PrivacyPolicyPage() {
   return (
-    <div>PrivacyPolicy</div>
+    <>
+      <Header />
+      <PrivacyPolicyComponent />
+    </>
   )
 }
 
-export default PrivacyPolicy
+export default PrivacyPolicyPage

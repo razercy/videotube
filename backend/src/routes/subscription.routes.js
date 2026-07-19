@@ -13,10 +13,10 @@ const router = Router();
 
 router
     .route("/c/:channelId")
-    .get(getSubscribedChannels)
+    .get(getUserChannelSubscribers)
     .post(verifyJWT, toggleSubscription);
 
-router.route("/u/:subscriberId").get(getUserChannelSubscribers);
+router.route("/u/:subscriberId").get(getSubscribedChannels);
 
 router.route("/:channelId").get(verifyJWT, isSubscribed);
 

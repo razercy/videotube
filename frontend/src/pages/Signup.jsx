@@ -1,9 +1,10 @@
 import React from 'react'
+import { Signup as SignupComponent } from '../components/index.js'
 
-function Signup() {
+function SignupPage() {
   return (
-    <div>Signup</div>
+    <SignupComponent />
   )
 }
 
-export default Signup
+export default SignupPage

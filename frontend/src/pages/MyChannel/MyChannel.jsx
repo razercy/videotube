@@ -1,9 +1,16 @@
 import React from 'react'
+import { Channel as ChannelComponent, Header, Sidebar } from '../../components/index.js'
+import { Outlet } from 'react-router-dom'
 
-function MyChannel() {
+function MyChannelPage() {
   return (
-    <div>MyChannel</div>
+    <>
+      <Header />
+      <Sidebar />
+      <ChannelComponent />
+      <Outlet />
+    </>
   )
 }
 
-export default MyChannel
+export default MyChannelPage

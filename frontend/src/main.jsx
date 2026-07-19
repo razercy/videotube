@@ -31,7 +31,7 @@ import store from './store/store.js'
 import Playlist from './pages/Playlist.jsx'
 import LikedVideos from './pages/LikedVideos.jsx'
 import WatchHistory from './pages/WatchHistory.jsx'
-import Subscribers from './pages/Subscribers.jsx'
+import Subscriptions from './pages/Subscriptions.jsx'
 
 const router = createBrowserRouter([
   {
@@ -218,11 +218,11 @@ const router = createBrowserRouter([
         )
       },
       {
-        path: "/channel/:channel/subscribers",
+        path: "/feed/subscriptions",
         element: (
           <AuthLayout authentication>
             {" "}
-            <Subscribers />
+            <Subscriptions />
           </AuthLayout>
         )
       }

@@ -1,9 +1,13 @@
 import React from 'react'
+import { Header, TnC as TnCComponent } from '../components/index.js'
 
-function TnC() {
+function TnCPage() {
   return (
-    <div>TnC</div>
+    <>
+      <Header />
+      <TnCComponent />
+    </>
   )
 }
 
-export default TnC
+export default TnCPage

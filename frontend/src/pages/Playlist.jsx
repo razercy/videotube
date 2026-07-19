@@ -1,9 +1,14 @@
 import React from 'react'
+import { Header, Playlist as PlaylistComponent, Sidebar } from '../components/index.js'
 
-function Playlist() {
+function PlaylistPage() {
   return (
-    <div>Playlist</div>
+    <>
+      <Header />
+      <Sidebar />
+      <PlaylistComponent />
+    </>
   )
 }
 
-export default Playlist
+export default PlaylistPage

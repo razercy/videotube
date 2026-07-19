@@ -1,9 +1,14 @@
 import React from 'react'
+import { Header, ListViewListing as ListViewListingComponent, Sidebar } from '../components/index.js'
 
-function ListViewListing() {
+function ListViewListingPage() {
   return (
-    <div>ListViewListing</div>
+    <>
+      <Header />
+      <Sidebar />
+      <ListViewListingComponent />
+    </>
   )
 }
 
-export default ListViewListing
+export default ListViewListingPage

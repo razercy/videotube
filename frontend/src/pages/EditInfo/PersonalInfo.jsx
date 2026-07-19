@@ -1,9 +1,10 @@
 import React from 'react'
+import { PersonalInfo as PersonalInfoComponent } from '../../components/index.js'
 
-function PersonalInfo() {
+function PersonalInfoPage() {
   return (
-    <div>PersonalInfo</div>
+    <PersonalInfoComponent />
   )
 }
 
-export default PersonalInfo
+export default PersonalInfoPage

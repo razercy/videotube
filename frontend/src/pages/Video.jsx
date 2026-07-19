@@ -1,9 +1,14 @@
 import React from 'react'
+import { Header, Sidebar, Video as VideoComponent } from '../components/index.js'
 
-function Video() {
+function VideoPage() {
   return (
-    <div>Video</div>
+    <>
+      <Header />
+      <Sidebar />
+      <VideoComponent />
+    </>
   )
 }
 
-export default Video
+export default VideoPage

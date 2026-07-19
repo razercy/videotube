@@ -94,12 +94,8 @@ function Sidebar() {
     }
   }, [authStatus, authUserData?._id, authUserData?.username])
 
-  const handleSubscribersClick = () => {
-    if (!channelProfile?._id) {
-      return
-    }
-
-    navigate(`/channel/${encodeURIComponent(channelProfile._id)}/subscribers`)
+  const handleSubscriptionsClick = () => {
+    navigate("/feed/subscriptions")
   }
 
   return (
@@ -170,19 +166,14 @@ function Sidebar() {
             </li>
             <li className="">
               <button
-              onClick={handleSubscribersClick}
-              disabled={isLoadingChannelProfile && !channelProfile?._id}
+              onClick={handleSubscriptionsClick}
               className="flex flex-col items-center justify-center border-white py-1 focus:text-[#ae7aff] sm:w-full sm:flex-row sm:border sm:p-1.5 sm:group-hover:justify-start sm:group-hover:px-4 sm:hover:bg-[#ae7aff] sm:hover:text-black sm:focus:border-[#ae7aff] sm:focus:bg-[#ae7aff] sm:focus:text-black lg:justify-start lg:px-4">
                 <span className="inline-block w-5 shrink-0 sm:group-hover:mr-4 lg:mr-4">
                   <svg style={{ width: "100%" }} viewBox="0 0 22 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M11 13.5H6.5C5.10444 13.5 4.40665 13.5 3.83886 13.6722C2.56045 14.06 1.56004 15.0605 1.17224 16.3389C1 16.9067 1 17.6044 1 19M15 16L17 18L21 14M13.5 5.5C13.5 7.98528 11.4853 10 9 10C6.51472 10 4.5 7.98528 4.5 5.5C4.5 3.01472 6.51472 1 9 1C11.4853 1 13.5 3.01472 13.5 5.5Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"></path>
                   </svg>
                 </span>
-                {
-                  !channelProfile?._id && !authUserData?._id && isLoadingChannelProfile
-                  ? <h1>Loading...</h1>
-                  : <span className="block sm:hidden sm:group-hover:inline lg:inline">Subscribers</span>
-                }
+                <span className="block sm:hidden sm:group-hover:inline lg:inline">Subscriptions</span>
               </button>
             </li>
             <li className="mt-auto hidden sm:block">

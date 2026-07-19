@@ -43,12 +43,18 @@ const toggleSubscription = asyncHandler(async (req, res) => {
 // controller to return subscriber list of a channel
 const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     const {channelId} = req.params
+
+    if (!isValidObjectId(channelId)) {
+        throw new ApiError(400, "Invalid channel id")
+    }
+
+    const channelObjectId = new mongoose.Types.ObjectId(channelId)
     // const channel = await User.findById(channelId)
 
     const embeddedUserChannelSubscribers = await Subscription.aggregate([
         {
             $match: {
-                channel: channelId,
+                channel: channelObjectId,
                 subscriber: {
                     $ne: null,
                     $exists: true
@@ -73,7 +79,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
         }
     ])
 
-    const userChannelSubscribers = embeddedUserChannelSubscribers((element) => element.channelSubscribers)
+    const userChannelSubscribers = embeddedUserChannelSubscribers.map((element) => element.channelSubscribers)
 
     return res
     .status(200)
@@ -85,12 +91,18 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
 // controller to return channel list to which user has subscribed
 const getSubscribedChannels = asyncHandler(async (req, res) => {
     const { subscriberId } = req.params
+
+    if (!isValidObjectId(subscriberId)) {
+        throw new ApiError(400, "Invalid subscriber id")
+    }
+
+    const subscriberObjectId = new mongoose.Types.ObjectId(subscriberId)
     // const subscriber = await User.findById(subscriberId)
 
     const embeddedSubscribedChannels = await Subscription.aggregate([
         {
             $match: {
-                subscriber: subscriberId,
+                subscriber: subscriberObjectId,
                 channel: {
                     $ne: null,
                     $exists: true
@@ -115,7 +127,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
         }
     ])
 
-    const subscribedChannels = embeddedSubscribedChannels((element) => element.subscribeChannels)
+    const subscribedChannels = embeddedSubscribedChannels.map((element) => element.subscribeChannels)
 
     return res
     .status(200)

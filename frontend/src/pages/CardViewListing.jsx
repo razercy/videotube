@@ -1,9 +1,14 @@
 import React from 'react'
+import { CardViewListing as CardViewListingComponent, Header, Sidebar } from '../components/index.js'
 
-function CardViewListing() {
+function CardViewListingPage() {
   return (
-    <div>CardViewListing</div>
+    <>
+      <Header />
+      <Sidebar />
+      <CardViewListingComponent />
+    </>
   )
 }
 
-export default CardViewListing
+export default CardViewListingPage

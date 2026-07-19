@@ -1,9 +1,10 @@
 import React from 'react'
+import { ChgPassword as ChgPasswordComponent } from '../../components/index.js'
 
-function ChgPassword() {
+function ChgPasswordPage() {
   return (
-    <div>ChgPassword</div>
+    <ChgPasswordComponent />
   )
 }
 
-export default ChgPassword
+export default ChgPasswordPage

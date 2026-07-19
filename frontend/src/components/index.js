@@ -17,7 +17,7 @@ import Signup from "./Signup";
 import PrivacyPolicy from "./PrivacyPolicy";
 import TnC from "./TnC";
 import Video from "./Video";
-import Subscribers from "./Subscribers";
+import Subscriptions from "./Subscriptions";
 import UploadVideo from "./UploadVideo";
 import Channel from "./Channel/Channel";
 import EditInfo from "./EditInfo/EditInfo";
@@ -43,7 +43,7 @@ export {
     PrivacyPolicy,
     TnC,
     Video,
-    Subscribers,
+    Subscriptions,
     UploadVideo,
     Channel,
     EditInfo,

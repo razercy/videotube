@@ -1,8 +1,13 @@
 import React from 'react'
+import { CardViewListing, Header, Sidebar } from '../components/index.js'
 
 function WatchHistory() {
   return (
-    <div>WatchHistory</div>
+    <>
+      <Header />
+      <Sidebar />
+      <CardViewListing />
+    </>
   )
 }
 

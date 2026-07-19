@@ -1,8 +1,13 @@
 import React from 'react'
+import { Header, Playlist, Sidebar } from '../components/index.js'
 
 function LikedVideos() {
   return (
-    <div>LikedVideos</div>
+    <>
+      <Header />
+      <Sidebar />
+      <Playlist />
+    </>
   )
 }
 

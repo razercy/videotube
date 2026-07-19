@@ -1,9 +1,13 @@
 import React from 'react'
+import { Dashboard as DashboardComponent, Header } from '../components/index.js'
 
-function Dashboard() {
+function DashboardPage() {
   return (
-    <div>Dashboard</div>
+    <>
+      <Header />
+      <DashboardComponent />
+    </>
   )
 }
 
-export default Dashboard
+export default DashboardPage

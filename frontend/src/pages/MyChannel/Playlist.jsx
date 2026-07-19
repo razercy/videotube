@@ -1,8 +1,9 @@
 import React from 'react'
+import { ChannelPlaylist } from '../../components/index.js'
 
 function Playlist() {
   return (
-    <div>Playlist</div>
+    <ChannelPlaylist />
   )
 }
 

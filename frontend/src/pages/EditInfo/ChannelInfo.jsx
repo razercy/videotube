@@ -1,9 +1,10 @@
 import React from 'react'
+import { ChannelInfo as ChannelInfoComponent } from '../../components/index.js'
 
-function ChannelInfo() {
+function ChannelInfoPage() {
   return (
-    <div>ChannelInfo</div>
+    <ChannelInfoComponent />
   )
 }
 
-export default ChannelInfo
+export default ChannelInfoPage

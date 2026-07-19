@@ -75,7 +75,7 @@ function Subscribed() {
         }
 
         const subscribeesResponse = await axios.get(
-          `/api/v1/subscriptions/c/${encodeURIComponent(subscriberId)}`,
+          `/api/v1/subscriptions/u/${encodeURIComponent(subscriberId)}`,
           requestConfig
         )
 

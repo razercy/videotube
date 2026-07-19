@@ -1,8 +1,9 @@
 import React from 'react'
+import { ChannelTweets } from '../../components/index.js'
 
 function Tweets() {
   return (
-    <div>Tweets</div>
+    <ChannelTweets />
   )
 }
 
